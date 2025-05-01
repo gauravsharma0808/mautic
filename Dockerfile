@@ -1,45 +1,41 @@
-# Use an official PHP runtime as a parent image
+# Use official PHP-Apache base image
 FROM php:8.1-apache
 
-# Set the working directory to /var/www/html
+# Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies
+# Install required packages
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libzip-dev \
-    zip \
     unzip \
-    git \
     curl \
-    libonig-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring zip ctype
-RUN apt-get update && apt-get install -y \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
+    git \
     libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd
-
+    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql zip mbstring xml
 
 # Enable Apache rewrite module
 RUN a2enmod rewrite
 
-# Download Mautic
-RUN curl -O https://github.com/mautic/mautic/releases/download/4.4.9/mautic-4.4.9.zip
+# Clone Mautic source code
+RUN git clone --branch 4.4.9 https://github.com/mautic/mautic.git /var/www/html
 
-# Unzip Mautic
-RUN unzip mautic-4.4.9.zip -d /var/www/html
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set directory permissions
-RUN chown -R www-data:www-data /var/www/html/var
-RUN chmod -R 755 /var/www/html/var
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www/html
 
 # Expose port 80
 EXPOSE 80
 
-# Set the default command to start Apache
+# Start Apache
 CMD ["apache2-foreground"]
