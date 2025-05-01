@@ -1,4 +1,4 @@
-FROM php:8.1-apache
+FROM php:8.0-apache
 
 # Set working directory
 WORKDIR /var/www/html
@@ -32,8 +32,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Clear composer cache before install
 RUN composer clear-cache
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP dependencies with verbose output
+RUN composer install --no-dev --optimize-autoloader --verbose
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html
