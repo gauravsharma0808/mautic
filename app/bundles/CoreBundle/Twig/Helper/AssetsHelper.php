@@ -250,6 +250,12 @@ final class AssetsHelper
                 $this->assets[$this->context]['stylesheets'] = [];
             }
 
+            // If a minified version is available, use it
+            $minifiedPath = str_replace('.css', '.min.css', $s);
+            if (file_exists($this->pathsHelper->getSystemPath('root', true).'/'.$minifiedPath)) {
+                $s = $minifiedPath;
+            }
+
             if (!in_array($s, $this->assets[$this->context]['stylesheets'])) {
                 $this->assets[$this->context]['stylesheets'][] = $s;
             }
