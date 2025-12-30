@@ -60,7 +60,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.helper.email.address', Mautic\CoreBundle\Helper\EmailAddressHelper::class);
     $services->alias('mautic.helper.assetgeneration', Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
 
-    $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
+    $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)
+        ->arg(Symfony\Component\HttpKernel\KernelInterface::class, service('kernel'))
+        ->arg(Mautic\CoreBundle\Helper\PathsHelper::class, service('mautic.helper.paths'))
+        ->tag('twig.helper', ['alias' => 'assets']);
 
     $services->get(Mautic\CoreBundle\Model\NotificationModel::class)->call('setDisableUpdates', ['%mautic.security.disableUpdates%']);
     $services->alias('mautic.core.model.auditlog', Mautic\CoreBundle\Model\AuditLogModel::class);
