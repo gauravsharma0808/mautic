@@ -144,3 +144,6 @@ tests/**/*.sql
 !/themes/blank-big.png
 
 /translations
+
+# Ignore minified CSS files
+*.min.css

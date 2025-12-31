@@ -9,6 +9,7 @@ use Mautic\InstallBundle\Install\InstallService;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class AssetsHelper
 {
@@ -48,6 +49,8 @@ final class AssetsHelper
 
     public function __construct(
         private Packages $packages,
+        private KernelInterface $kernel,
+        private PathsHelper $pathsHelper
     ) {
     }
 
@@ -246,6 +249,12 @@ final class AssetsHelper
     public function addStylesheet($stylesheet)
     {
         $addSheet = function ($s): void {
+            if ('prod' === $this->kernel->getEnvironment()) {
+                $minifiedPath = str_replace('.css', '.min.css', $s);
+                if (file_exists($this->pathsHelper->getAssetsPath().$minifiedPath)) {
+                    $s = $minifiedPath;
+                }
+            }
             if (!isset($this->assets[$this->context]['stylesheets'])) {
                 $this->assets[$this->context]['stylesheets'] = [];
             }
@@ -562,7 +571,7 @@ final class AssetsHelper
         $links = [];
 
         // Extract existing links and tags
-        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links): string {
+        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i, function ($match) use (&$links): string {
             return '<'.array_push($links, $match[1]).'>';
         }, $text);
 
