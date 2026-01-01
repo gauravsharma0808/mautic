@@ -9,6 +9,7 @@ use Mautic\InstallBundle\Install\InstallService;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class AssetsHelper
 {
@@ -35,19 +36,15 @@ final class AssetsHelper
 
     private ?string $version = null;
 
-    /**
-     * @var string
-     */
-    private $siteUrl;
-
-    private ?PathsHelper $pathsHelper = null;
-
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 
     private InstallService $installService;
 
     public function __construct(
         private Packages $packages,
+        private KernelInterface $kernel,
+        private PathsHelper $pathsHelper,
+        private ?string $siteUrl = null // @todo: do not allow null in Mautic 6
     ) {
     }
 
@@ -246,6 +243,14 @@ final class AssetsHelper
     public function addStylesheet($stylesheet)
     {
         $addSheet = function ($s): void {
+            // If dev, load as is. If prod, load minified if it exists
+            if ('prod' === $this->kernel->getEnvironment()) {
+                $minifiedPath = str_replace('.css', '.min.css', $s);
+                if (file_exists($this->pathsHelper->getSystemPath('root', true) . $minifiedPath)) {
+                    $s = $minifiedPath;
+                }
+            }
+
             if (!isset($this->assets[$this->context]['stylesheets'])) {
                 $this->assets[$this->context]['stylesheets'] = [];
             }
@@ -661,6 +666,7 @@ final class AssetsHelper
      */
     public function setSiteUrl($siteUrl): void
     {
+        // @deprecated since Mautic 5.0, to be removed in Mautic 6.0 with no replacement.
         if ($siteUrl && str_ends_with($siteUrl, '/')) {
             $siteUrl = substr($siteUrl, 0, -1);
         }
@@ -670,6 +676,7 @@ final class AssetsHelper
 
     public function setPathsHelper(PathsHelper $pathsHelper): void
     {
+        // @deprecated since Mautic 5.0, to be removed in Mautic 6.0 with no replacement.
         $this->pathsHelper = $pathsHelper;
     }
 
