@@ -54,6 +54,9 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias(Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
     $services->alias('mautic.model.factory', Mautic\CoreBundle\Factory\ModelFactory::class);
+    $services->get(Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)
+        ->arg('$kernel', service('kernel'))
+        ->arg('$pathsHelper', service('mautic.helper.paths'));
     $services->alias('twig.helper.assets', Mautic\CoreBundle\Twig\Helper\AssetsHelper::class);
     $services->alias('transifex.factory', Mautic\CoreBundle\Factory\TransifexFactory::class);
     $services->alias('mautic.helper.language', Mautic\CoreBundle\Helper\LanguageHelper::class);
