@@ -4,6 +4,7 @@
   "description": "Mautic Open Source Distribution",
   "devDependencies": {
     "grunt": "^1.6.1",
+    "grunt-contrib-cssmin": "^5.0.0",
     "grunt-contrib-less": "^3.0.0",
     "grunt-contrib-watch": "^1.1.0",
     "patch-package": "^7.0.0",
@@ -66,7 +67,7 @@
     "vimeo-froogaloop2": "^0.1.1"
   },
   "scripts": {
-    "build": "webpack --mode production  --config webpack.config.js",
+    "build": "grunt build && webpack --mode production --config webpack.config.js",
     "postinstall": "npm run build"
   }
 }

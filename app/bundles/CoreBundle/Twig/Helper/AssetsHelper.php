@@ -9,6 +9,7 @@ use Mautic\InstallBundle\Install\InstallService;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class AssetsHelper
 {
@@ -40,14 +41,14 @@ final class AssetsHelper
      */
     private $siteUrl;
 
-    private ?PathsHelper $pathsHelper = null;
-
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 
     private InstallService $installService;
 
     public function __construct(
         private Packages $packages,
+        private KernelInterface $kernel,
+        private PathsHelper $pathsHelper
     ) {
     }
 
@@ -246,6 +247,16 @@ final class AssetsHelper
     public function addStylesheet($stylesheet)
     {
         $addSheet = function ($s): void {
+            // If the file is not a URL, check for a minified version
+            if ('prod' === $this->kernel->getEnvironment() && !str_starts_with($s, 'http') && !str_starts_with($s, '//')) {
+                $minifiedPath = str_replace('.css', '.min.css', $s);
+
+                // Check if the minified file exists
+                if (file_exists($this->pathsHelper->getSystemPath('root', true).'/'.$minifiedPath)) {
+                    $s = $minifiedPath;
+                }
+            }
+
             if (!isset($this->assets[$this->context]['stylesheets'])) {
                 $this->assets[$this->context]['stylesheets'] = [];
             }
@@ -666,11 +677,6 @@ final class AssetsHelper
         }
 
         $this->siteUrl = $siteUrl;
-    }
-
-    public function setPathsHelper(PathsHelper $pathsHelper): void
-    {
-        $this->pathsHelper = $pathsHelper;
     }
 
     /**
