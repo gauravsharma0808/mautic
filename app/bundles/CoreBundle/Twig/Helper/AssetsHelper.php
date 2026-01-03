@@ -40,14 +40,14 @@ final class AssetsHelper
      */
     private $siteUrl;
 
-    private ?PathsHelper $pathsHelper = null;
-
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 
     private InstallService $installService;
 
     public function __construct(
         private Packages $packages,
+        private PathsHelper $pathsHelper,
+        private string $kernelEnvironment
     ) {
     }
 
@@ -246,6 +246,14 @@ final class AssetsHelper
     public function addStylesheet($stylesheet)
     {
         $addSheet = function ($s): void {
+            // Conditionally load minified CSS in production
+            if ('prod' === $this->kernelEnvironment) {
+                $minifiedPath = str_replace('.css', '.min.css', $s);
+                if (file_exists($this->pathsHelper->getDocrootPath().$minifiedPath)) {
+                    $s = $minifiedPath;
+                }
+            }
+
             if (!isset($this->assets[$this->context]['stylesheets'])) {
                 $this->assets[$this->context]['stylesheets'] = [];
             }

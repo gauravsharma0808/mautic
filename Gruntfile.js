@@ -3,6 +3,7 @@
 module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -19,7 +20,7 @@ module.exports = function (grunt) {
         watch: {
             less: {
                 files: ['<%= mautic.bundleAssets %>/**/*.less', '<%= mautic.bundleAssets %>/../builder/*.less'],
-                tasks: ['less']
+                tasks: ['less', 'cssmin']
             }
         },
 
@@ -36,11 +37,29 @@ module.exports = function (grunt) {
             options: {
                 javascriptEnabled: true
             }
+        },
+
+        // Minify CSS
+        cssmin: {
+            files: {
+                src: ['<%= mautic.bundleAssets %>/*.css', '<%= mautic.pluginAssets %>/*.css', '<%= mautic.bundleAssets %>/*/*.css', '!**/*.min.css', '<%= mautic.bundleAssets %>/../builder/*.css'],
+                expand: true,
+                rename: function (dest, src) {
+                    return dest + src.replace('.css', '.min.css');
+                },
+                dest: ''
+            }
         }
     });
 
     grunt.registerTask('compile-less', [
         'less',
+        'cssmin',
         'watch'
+    ]);
+
+    grunt.registerTask('build', [
+        'less',
+        'cssmin'
     ]);
 };
