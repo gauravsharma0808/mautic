@@ -34,6 +34,7 @@ module.exports = function (grunt) {
                 dest: ''
             },
             options: {
+                compress: true,
                 javascriptEnabled: true
             }
         }
