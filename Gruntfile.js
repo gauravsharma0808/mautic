@@ -34,7 +34,9 @@ module.exports = function (grunt) {
                 dest: ''
             },
             options: {
-                javascriptEnabled: true
+                javascriptEnabled: true,
+                // Enable CSS compression to reduce final bundle size
+                compress: true
             }
         }
     });
