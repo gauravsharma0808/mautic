@@ -34,7 +34,9 @@ module.exports = function (grunt) {
                 dest: ''
             },
             options: {
-                javascriptEnabled: true
+                javascriptEnabled: true,
+                // ⚡ Bolt: Minify CSS to reduce asset size and improve page load performance.
+                compress: true
             }
         }
     });
