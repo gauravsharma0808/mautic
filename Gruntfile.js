@@ -33,8 +33,10 @@ module.exports = function (grunt) {
                 },
                 dest: ''
             },
+            // Add compression option to minify CSS output
             options: {
-                javascriptEnabled: true
+                javascriptEnabled: true,
+                compress: true
             }
         }
     });
