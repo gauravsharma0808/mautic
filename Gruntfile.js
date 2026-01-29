@@ -34,6 +34,8 @@ module.exports = function (grunt) {
                 dest: ''
             },
             options: {
+                // Minify CSS to reduce filesize
+                compress: true,
                 javascriptEnabled: true
             }
         }
