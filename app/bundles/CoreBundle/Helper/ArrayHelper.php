@@ -40,10 +40,14 @@ class ArrayHelper
 
     /**
      * Selects keys defined in the $keys array and returns array that contains only those.
+     *
+     * This implementation uses array_intersect_key and array_flip for better performance
+     * than array_filter and in_array, especially for large arrays. Complexity is O(n+m)
+     * where n is the number of elements in $origin and m is the number of elements in $keys.
      */
     public static function select(array $keys, array $origin): array
     {
-        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
+        return array_intersect_key($origin, array_flip($keys));
     }
 
     /**
