@@ -643,9 +643,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailStats            = $this->getStatRepository()->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds);
         $results['read_count'] = $results['clicked_through_count'] = [];
 
+        // Hoist array_flip out of the loop to avoid redundant calculations
+        $readCountKeys      = array_flip(['country', 'read_count']);
+        $clickedThroughKeys = array_flip(['country', 'clicked_through_count']);
+
         foreach ($emailStats as $e) {
-            $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
-            $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+            $results['read_count'][]            = array_intersect_key($e, $readCountKeys);
+            $results['clicked_through_count'][] = array_intersect_key($e, $clickedThroughKeys);
         }
 
         return $results;

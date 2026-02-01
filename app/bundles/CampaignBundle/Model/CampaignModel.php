@@ -847,9 +847,13 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds, 'campaign', $eventsIds);
             $results['read_count'] = $results['clicked_through_count'] = [];
 
+            // Hoist array_flip out of the loop to avoid redundant calculations
+            $readCountKeys      = array_flip(['country', 'read_count']);
+            $clickedThroughKeys = array_flip(['country', 'clicked_through_count']);
+
             foreach ($emailStats as $e) {
-                $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
-                $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+                $results['read_count'][]            = array_intersect_key($e, $readCountKeys);
+                $results['clicked_through_count'][] = array_intersect_key($e, $clickedThroughKeys);
             }
         }
 
