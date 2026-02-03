@@ -43,7 +43,8 @@ class ArrayHelper
      */
     public static function select(array $keys, array $origin): array
     {
-        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
+        // Using array_intersect_key with pre-filled keys provides O(n+m) performance while preserving order.
+        return array_intersect_key($origin, array_fill_keys($keys, null));
     }
 
     /**
