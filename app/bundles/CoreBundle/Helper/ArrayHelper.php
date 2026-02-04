@@ -40,10 +40,12 @@ class ArrayHelper
 
     /**
      * Selects keys defined in the $keys array and returns array that contains only those.
+     *
+     * Optimized to use array_intersect_key for O(n+m) performance instead of O(n*m).
      */
     public static function select(array $keys, array $origin): array
     {
-        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
+        return array_intersect_key($origin, array_fill_keys($keys, true));
     }
 
     /**
