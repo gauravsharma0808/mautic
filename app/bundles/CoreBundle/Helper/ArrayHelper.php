@@ -40,10 +40,32 @@ class ArrayHelper
 
     /**
      * Selects keys defined in the $keys array and returns array that contains only those.
+     *
+     * Optimized to O(n + m) complexity where n is the size of $origin and m is the size of $keys.
+     * Preserves strict type checking of keys as provided by in_array(..., true).
      */
     public static function select(array $keys, array $origin): array
     {
-        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
+        $stringKeys = [];
+        $intKeys    = [];
+        foreach ($keys as $key) {
+            if (is_string($key)) {
+                $stringKeys[$key] = true;
+            } elseif (is_int($key)) {
+                $intKeys[$key] = true;
+            }
+        }
+
+        return array_filter($origin, function ($key) use ($stringKeys, $intKeys): bool {
+            if (is_string($key)) {
+                return isset($stringKeys[$key]);
+            }
+            if (is_int($key)) {
+                return isset($intKeys[$key]);
+            }
+
+            return false;
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
